@@ -1,0 +1,11 @@
+package com.example.clinica.dto;
+
+public class MedicoResponseDTO {
+    private Long id;
+    private String nome;
+    private String especialidade;
+    private String telefone;
+
+    // Getters and Setters
+    
+}
