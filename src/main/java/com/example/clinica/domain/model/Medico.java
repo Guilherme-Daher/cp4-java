@@ -1,25 +1,24 @@
 package com.example.clinica.domain.model;
 
+import com.example.clinica.domain.model.vo.Email_Paciente;
+import com.example.clinica.domain.model.vo.Email_Paciente;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
-@Table(name = "medico")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Medico {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String nome;
-
-    @Column(nullable = false, unique = true)
     private String crm;
+    private String especialidade;
 
-    @OneToMany(mappedBy = "medico")
-    private List<Consulta> consultas = new ArrayList<>();
+    @Embedded
+    private Email_Paciente email;
 }

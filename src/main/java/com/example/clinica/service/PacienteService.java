@@ -2,39 +2,61 @@ package com.example.clinica.service;
 
 import com.example.clinica.domain.model.Paciente;
 import com.example.clinica.domain.model.vo.Cpf;
-import com.example.clinica.domain.model.vo.Email;
-import com.example.clinica.dto.PacienteCreateDTO;
-import com.example.clinica.dto.PacienteResponseDTO;
+import com.example.clinica.domain.model.vo.Email_Paciente;
+import com.example.clinica.dto.PacienteCreateRequest;
+import com.example.clinica.dto.PacienteResponse;
 import com.example.clinica.repository.PacienteRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-@Service @RequiredArgsConstructor
-public class PacienteService<PacienteCreateDTO> {
+import java.util.List;
+import java.util.stream.Collectors;
 
-    private final PacienteRepository repo;
+@Service
+@RequiredArgsConstructor
+public class PacienteService {
 
-    @Transactional
-    public Long criar(PacienteCreateDTO dto) {
-        repo.findByCpfValue(dto.cpf()).ifPresent(p -> {
-            throw new IllegalArgumentException("CPF já cadastrado");
-        });
-        Paciente paciente = Paciente.builder()
-                .nome(dto.nome())
-                .cpf(new Cpf(dto.cpf()))
-                .email(new Email(dto.email()))
-                .build();
-        return repo.save(paciente).getId();
+    private final PacienteRepository repository;
+
+    public PacienteResponse create(PacienteCreateRequest request) {
+        Paciente paciente = new Paciente();
+        paciente.setNome(request.getNome());
+        paciente.setCpf(new Cpf(request.getCpf()));
+        paciente.setEmail(new Email_Paciente(request.getEmail()));
+        paciente.setTelefone(request.getTelefone());
+
+        Paciente saved = repository.save(paciente);
+
+        return new PacienteResponse(
+                saved.getId(),
+                saved.getNome(),
+                saved.getCpf().getValue(),
+                saved.getEmail().getValue(),
+                saved.getTelefone()
+        );
     }
 
-    @Transactional(readOnly = true)
-    public Page<PacienteResponseDTO> listar(Pageable pageable) {
-        return repo.findAll(pageable)
-                .map(p -> new PacienteResponseDTO(
-                        p.getId(), p.getNome(),
-                        p.getCpf().getValue(), p.getEmail().getValue()));
+    public PacienteResponse findById(Long id) {
+        Paciente paciente = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Paciente não encontrado"));
+
+        return new PacienteResponse(
+                paciente.getId(),
+                paciente.getNome(),
+                paciente.getCpf().getValue(),
+                paciente.getEmail().getValue(),
+                paciente.getTelefone()
+        );
+    }
+
+    public List<PacienteResponse> list() {
+        return repository.findAll().stream()
+                .map(p -> new PacienteResponse(
+                        p.getId(),
+                        p.getNome(),
+                        p.getCpf().getValue(),
+                        p.getEmail().getValue(),
+                        p.getTelefone()))
+                .collect(Collectors.toList());
     }
 }

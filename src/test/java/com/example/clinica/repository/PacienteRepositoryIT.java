@@ -2,7 +2,7 @@ package com.example.clinica.repository;
 
 import com.example.clinica.domain.model.Paciente;
 import com.example.clinica.domain.model.vo.Cpf;
-import com.example.clinica.domain.model.vo.Email;
+import com.example.clinica.domain.model.vo.Email_Paciente;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,7 +40,7 @@ class PacienteRepositoryIT {
         Paciente p = Paciente.builder()
                 .nome("Ana")
                 .cpf(new Cpf("12345678901"))
-                .email(new Email("ana@example.com"))
+                .email(new Email_Paciente("ana@example.com"))
                 .build();
         repo.save(p);
         assertTrue(repo.findByCpfValue("12345678901").isPresent());

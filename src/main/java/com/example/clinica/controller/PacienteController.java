@@ -1,19 +1,14 @@
 package com.example.clinica.controller;
 
-import com.example.clinica.dto.PacienteCreateDTO;
-import com.example.clinica.dto.PacienteResponseDTO;
+import com.example.clinica.dto.PacienteCreateRequest;
+import com.example.clinica.dto.PacienteResponse;
 import com.example.clinica.service.PacienteService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
-import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/pacientes")
@@ -22,17 +17,19 @@ public class PacienteController {
 
     private final PacienteService service;
 
-    @Operation(summary = "Cria um paciente")
-    @ApiResponse(responseCode = "201", description = "Criado")
     @PostMapping
-    public ResponseEntity<Void> criar(@Valid @RequestBody PacienteCreateDTO dto) {
-        Long id = service.criar(dto);
-        return ResponseEntity.created(URI.create("/pacientes/" + id)).build();
+    @ResponseStatus(HttpStatus.CREATED)
+    public PacienteResponse create(@RequestBody @Valid PacienteCreateRequest request) {
+        return service.create(request);
     }
 
-    @Operation(summary = "Lista pacientes com paginação")
+    @GetMapping("/{id}")
+    public PacienteResponse findById(@PathVariable Long id) {
+        return service.findById(id);
+    }
+
     @GetMapping
-    public Page<PacienteResponseDTO> listar(@ParameterObject Pageable pageable) {
-        return service.listar(pageable);
+    public List<PacienteResponse> list() {
+        return service.list();
     }
 }
